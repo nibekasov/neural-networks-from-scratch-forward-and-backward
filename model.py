@@ -37,8 +37,33 @@ def gradient_check(analytic_grad, numeric_grad, tol=1e-5):
 
     return float(np.max(relative_error, initial=0.0))
 
-# Step 3 - make_dense (not yet solved)
-# TODO: implement
+# Step 3 - make_dense
+import numpy as np
+
+def make_dense(in_dim, out_dim, weight_init_fn):
+    W, b = weight_init_fn(in_dim, out_dim)
+    params = {"W": W, "b": b}
+
+    def forward(x):
+        y = x @ params["W"] + params["b"]
+        cache = (x, params["W"].copy())
+        return y, cache
+
+    def backward(dout, cache):
+        x, W = cache
+
+        dx = dout @ W.T
+        grads = {
+            "W": x.T @ dout,
+            "b": np.sum(dout, axis=0),
+        }
+        return dx, grads
+
+    return {
+        "params": params,
+        "forward": forward,
+        "backward": backward,
+    }
 
 # Step 4 - make_activation (not yet solved)
 # TODO: implement
